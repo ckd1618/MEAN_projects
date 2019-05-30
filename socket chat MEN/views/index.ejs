@@ -1,0 +1,76 @@
+
+<html>
+    <head>
+        <title>Insert title here</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type ="text/javascript">
+            $(document).ready(function(){
+                console.log('ejs1');
+                var socket = io();
+                console.log('ejs2');
+                var person;
+                while(person == '' || person == null){
+                    person = prompt('Please enter your name');
+                }
+                $('form').submit(function(detourform){
+                    detourform.preventDefault();
+                    
+                    console.log('look here ' + $('#msg').val());
+                    socket.emit('userinfo', {
+                        name: person,
+                        msg: $('#msg').val()
+                    });
+                    $("form")[0].reset();
+                });
+                // $('#clear').submit(function(detourform){
+                //     detourform.preventDefault();
+                //     $("form")[0].reset();
+                //     socket.emit('clearhistory', {});
+                // });
+                socket.on('update', function(data){
+                    console.log(`data front: ${JSON.stringify(data.all)}`);
+
+                    var k = '<tbody>'
+                    for(var i=0;i < data.all.length; i++){
+                        k+= '<tr>';
+                        k+= '<td>' + data.all[i].name + '</td>';
+                        k+= '<td>' + data.all[i].msg + '</td>';
+                        k+= '</tr>';
+                    }
+                    k+='</tbody>';
+                    console.log(k)
+                    $('#showhere').html(k);
+                    // document.getElementById('showhere').innerHTML = k;
+
+                    // $('#showhere').html(`<p>${JSON.stringify(data)}</p>`);
+                });
+
+                //disconnect
+                socket.on('userLeft', function(data) {
+                    console.log(`${JSON.stringify(data.message)}`)
+                    //$('notification').html(data);
+                    //document.querySelector('.notification').innerHTML = data
+                })
+                
+
+            })
+        </script>
+    </head>
+    <body>
+        <!-- <a href='' id='clear'>clear</a> -->
+        <form action="">
+            <input type="text" placeholder='enter your message here' id='msg' name="msg"><br>
+            <button id='submit'>Send</button>
+        </form>
+        <table id='showhere'>
+
+          </table>
+        
+
+
+        
+        
+        
+    </body>
+</html>
